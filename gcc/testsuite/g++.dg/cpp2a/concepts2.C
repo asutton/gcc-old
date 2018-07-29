@@ -8,6 +8,8 @@ concept Class = __is_class(T);
 template<typename T, typename U>
 concept Classes = __is_class(T) && __is_class (U);
 
+struct empty { };
+
 template<typename T>
 struct S
 {
@@ -43,4 +45,26 @@ int main()
   
   S<X>::Inner<int> si2;
   si2.g(); // { dg-error "no matching function" }
+}
+
+// Check constraints on non-dependent arguments, even when in a
+// dependent context.
+
+template<typename T>
+  requires Class<T>
+void constrained_f(T x) { }
+
+template<typename T>
+void caller_1(T x) { 
+  constrained_f(x); // Unchecked dependent arg.
+}
+
+template<typename T>
+void caller_2(T x) { 
+  constrained_f(empty{}); // Checked non-dependent arg, but OK
+}
+
+template<typename T>
+void caller_3() {
+  constrained_f(0); // { dg-error "cannot call function" }
 }
