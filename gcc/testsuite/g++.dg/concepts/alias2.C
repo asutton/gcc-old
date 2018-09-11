@@ -1,3 +1,4 @@
+// No template alias using short form
 // { dg-options "-std=c++17 -fconcepts" }
 
 template<typename T>
