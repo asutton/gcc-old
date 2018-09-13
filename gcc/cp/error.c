@@ -32,6 +32,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "ubsan.h"
 #include "internal-fn.h"
 #include "gcc-rich-location.h"
+#include "print-tree.h"
 
 #define pp_separate_with_comma(PP) pp_cxx_separate_with (PP, ',')
 #define pp_separate_with_semicolon(PP) pp_cxx_separate_with (PP, ';')
@@ -1269,6 +1270,10 @@ dump_decl (cxx_pretty_printer *pp, tree t, int flags)
       dump_decl_name (pp, DECL_NAME (t), flags);
       break;
 
+    case WILDCARD_DECL:
+      pp_string (pp, "<wildcard>");
+      break;
+
     case TEMPLATE_ID_EXPR:
       {
 	tree name = TREE_OPERAND (t, 0);
@@ -2069,6 +2074,7 @@ dump_expr (cxx_pretty_printer *pp, tree t, int flags)
     case TEMPLATE_DECL:
     case NAMESPACE_DECL:
     case LABEL_DECL:
+    case WILDCARD_DECL:
     case OVERLOAD:
     case TYPE_DECL:
     case IDENTIFIER_NODE:
