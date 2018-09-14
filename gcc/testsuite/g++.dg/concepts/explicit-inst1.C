@@ -1,3 +1,4 @@
+// needs port; see { dg-final { scan-assembler "symbol" } }
 // { dg-options "-std=c++17 -fconcepts" }
 
 template<typename T>
