@@ -1,12 +1,15 @@
 // PR c++/66758
-// { dg-options "-std=c++17 -fconcepts" }
+// { dg-do compile }
+// { dg-options "-std=c++2a" }
 
 template <class T, class U>
-concept bool C = requires (T t, U u) { t + u; };
+concept C = requires (T t, U u) { t + u; };
 
 template <class T, class U>
-requires C<T,U>
+  requires C<T,U>
 void f(T t, U u) { t + u; }
+
+struct non_addable { };
 
 int main()
 {
