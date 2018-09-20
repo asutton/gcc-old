@@ -127,6 +127,7 @@ finish_constraint_primary_expr (location_t loc, tree expr)
 tree
 combine_constraint_expressions (tree lhs, tree rhs)
 {
+  parsing_constraint_expression_sentinel pce;
   if (!lhs)
     return rhs;
   if (!rhs)
