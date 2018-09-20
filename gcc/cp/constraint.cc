@@ -2871,9 +2871,14 @@ diagnose_check (tree expr, tree args, tree in_decl)
   location_t dloc = DECL_SOURCE_LOCATION (DECL_TEMPLATE_RESULT (tmpl));
   inform (dloc, "within %qS", subst);
 
-
   /* Instantiate the concept definition...  */
   tree def = get_concept_definition (tmpl);
+  if (!def || def == error_mark_node)
+    {
+      inform (eloc, "invalid concept definition");
+      return;
+    }
+  
   expr = tsubst_expr (def, targs, tf_none, NULL_TREE, true);
   if (expr == error_mark_node)
     {
