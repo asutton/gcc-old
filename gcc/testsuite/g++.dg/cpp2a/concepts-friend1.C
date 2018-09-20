@@ -1,7 +1,7 @@
-// { dg-options "-std=c++17 -fconcepts" }
+// { dg-options "-std=c++2a" }
 
 template<typename T>
-  concept bool Eq() { return requires(T t) { t == t; }; }
+  concept Eq = requires(T t) { t == t; };
 
 struct Nt {
   template<Eq T> friend void f(T) { }
@@ -14,7 +14,7 @@ template<Eq T>
 
 template<typename T>
   struct S {
-    friend bool operator==(S, S) requires Eq<T>() { return true; }
+    friend bool operator==(S, S) requires Eq<T> { return true; }
 
     friend void proc<>(S*); // { dg-error "does not match any template declaration" }
   };

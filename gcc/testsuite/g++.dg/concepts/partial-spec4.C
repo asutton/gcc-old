@@ -1,3 +1,4 @@
+// needs port; thinks its a var concept
 // { dg-options "-std=c++17 -fconcepts" }
 
 template <class T> concept bool is_int = __is_same_as(T,int);

@@ -1,4 +1,4 @@
-// { dg-options "-std=c++17 -fconcepts" }
+// { dg-options "-std=c++2a" }
 
 template<typename... Ts> struct are_same;
 
@@ -27,10 +27,10 @@ template<typename... Ts>
   }
 
 template<typename... Ts>
-  concept bool C1 = are_same<Ts...>::value;
+  concept C1 = are_same<Ts...>::value;
 
 template<bool... Bs>
-  concept bool C2 = all_of(Bs...);
+  concept C2 = all_of(Bs...);
 
 template<C1... Ts> struct S1 { };
 template<C1...> struct S2 { };

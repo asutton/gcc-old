@@ -1,7 +1,7 @@
-// { dg-options "-std=c++17 -fconcepts" }
+// { dg-options "-std=c++2a" }
 
 template<typename T>
-  concept bool C() { return __is_class(T); }
+  concept C = __is_class(T);
 
 template<typename T>
   struct S1 {

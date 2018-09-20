@@ -1,3 +1,4 @@
+// needs port after issue 48 is resolved
 // PR c++/67138
 // { dg-options "-std=c++17 -fconcepts" }
 

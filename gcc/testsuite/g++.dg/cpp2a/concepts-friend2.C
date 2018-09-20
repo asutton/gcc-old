@@ -1,12 +1,12 @@
-// { dg-options "-std=c++17 -fconcepts" }
+// { dg-options "-std=c++2a" }
 
 template<typename T>
-  concept bool Eq() { return requires(T t) { t == t; }; }
+  concept Eq = requires(T t) { t == t; };
 
 template<Eq T> struct Foo { };
 
 template<typename T>
-  struct S { // { dg-error "constraint failure" }
+  struct S { // { dg-error "invalid" }
     template<Eq U> friend class Bar;
 
     friend class Foo<T>;

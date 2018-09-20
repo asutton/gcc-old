@@ -1,3 +1,4 @@
+// needs lines updated, still works
 // { dg-additional-options "-std=c++17 -fconcepts" }
 
 struct S

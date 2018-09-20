@@ -1,10 +1,10 @@
-// { dg-options "-std=c++17 -fconcepts" }
+// { dg-options "-std=c++2a" }
 
 template<int N, class T>
-  concept bool P() { return true; }
+  concept P = true;
 
 template<template<typename> class X, class T>
-  concept bool Q() { return true; }
+  concept Q = true;
 
 template<P<int> N> void f() { }
 template<Q<int> X> void g() { }

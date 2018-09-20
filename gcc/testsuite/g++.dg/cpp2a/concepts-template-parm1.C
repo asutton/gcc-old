@@ -1,13 +1,13 @@
-// { dg-options "-std=c++17 -fconcepts" }
+// { dg-options "-std=c++2a" }
 
 template<typename T>
-  concept bool C1 = __is_same_as(T, int);
+  concept C1 = __is_same_as(T, int);
 
 template<int N>
-  concept bool C2 = N == 0;
+  concept C2 = N == 0;
 
 template<template<typename> class X>
-  concept bool C3 = true;
+  concept C3 = true;
 
 template<typename> struct Foo;
 

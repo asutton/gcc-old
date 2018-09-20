@@ -1,4 +1,4 @@
-// { dg-options "-std=c++17 -fconcepts" }
+// { dg-options "-std=c++2a" }
 
 struct Base {
   template<typename T>
