@@ -1,13 +1,13 @@
-// { dg-options "-std=c++17 -fconcepts" }
+// { dg-options "-std=c++2a" }
 
 struct inner;
 
-template<typename X> concept bool CompoundReq = requires {
+template<typename X> concept CompoundReq = requires {
     // fine with concrete type in trailing type, i.e. inner& instead of X&
     { X::inner_member() } -> X&;
 };
 
-template<typename X> concept bool Concept = requires {
+template<typename X> concept Concept = requires {
     { X::outer_member() } -> CompoundReq;
 };
 

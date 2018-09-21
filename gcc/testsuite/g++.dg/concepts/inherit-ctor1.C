@@ -1,11 +1,11 @@
 // needs port; no tests where parent type is constrained
-// { dg-options "-std=c++17 -fconcepts" }
+// { dg-options "-std=c++2a" }
 
 template<typename T>
-  concept bool C() { return __is_class(T); }
+  concept C = __is_class(T);
 
 template<typename T>
-  struct S1 { S1(double) requires C<T>() { } };
+  struct S1 { S1(double) requires C<T> { } };
 
 struct S2 : S1<int> {
   using S1<int>::S1;

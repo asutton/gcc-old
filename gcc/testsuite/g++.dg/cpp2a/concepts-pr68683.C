@@ -1,4 +1,4 @@
-// { dg-options "-std=c++17 -fconcepts" }
+// { dg-options "-std=c++2a" }
 
 template <typename, typename>
 struct is_same {
@@ -6,10 +6,10 @@ struct is_same {
 };
 
 template <typename T, typename U>
-concept bool Same = is_same<T, U>::value;
+concept Same = is_same<T, U>::value;
 
 template <typename T>
-concept bool Integral = requires {
+concept Integral = requires {
   { T () } -> Same<typename T::value_type>;
 };
 

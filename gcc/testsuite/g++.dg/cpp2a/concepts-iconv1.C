@@ -1,5 +1,5 @@
 // PR c++/67240
-// { dg-options "-std=c++17 -fconcepts" }
+// { dg-options "-std=c++2a" }
 
 int foo(int x)
 {
@@ -7,12 +7,12 @@ int foo(int x)
 }
  
 template <typename T>
-concept bool C1 = requires (T x) {
+concept C1 = requires (T x) {
     {foo(x)} -> int&;
 };
 
 template <typename T>
-concept bool C2 = requires (T x) {
+concept C2 = requires (T x) {
     {foo(x)} -> void;
 };
  

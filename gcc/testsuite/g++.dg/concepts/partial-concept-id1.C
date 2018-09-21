@@ -1,4 +1,4 @@
-// needs fixed; ICE on line 23
+// needs fixed; expected identifier on 31 before concept name?
 // { dg-options "-std=c++2a" }
 
 template<typename T>

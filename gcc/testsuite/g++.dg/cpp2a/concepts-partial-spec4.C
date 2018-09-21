@@ -1,7 +1,6 @@
-// needs port; thinks its a var concept
-// { dg-options "-std=c++17 -fconcepts" }
+// { dg-options "-std=c++2a" }
 
-template <class T> concept bool is_int = __is_same_as(T,int);
+template <class T> concept is_int = __is_same_as(T,int);
 
 template <class T> struct A { };
 template <is_int T> struct A<T*> {

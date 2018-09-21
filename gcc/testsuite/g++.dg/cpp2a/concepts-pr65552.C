@@ -1,12 +1,11 @@
-// { dg-options "-std=c++17 -fconcepts" }
+// { dg-options "-std=c++2a" }
 
 template<typename T>
-concept bool Concept() {
-  return requires () {
+concept Concept =
+  requires () {
     typename T::member_type1;
     typename T::member_type2;
   };
-}
 
 struct model {
   using member_type1 = int;

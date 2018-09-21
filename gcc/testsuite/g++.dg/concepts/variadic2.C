@@ -1,8 +1,8 @@
-// { dg-options "-std=c++17 -fconcepts" }
+// { dg-options "-std=c++2a" }
 
-template <class T> concept bool Copyable = requires (T t) { T(t); };
-template <class T> concept bool Constructable = requires { T(); };
-template <class T> concept bool Both = Copyable<T> && Constructable<T>;
+template <class T> concept Copyable = requires (T t) { T(t); };
+template <class T> concept Constructable = requires { T(); };
+template <class T> concept Both = Copyable<T> && Constructable<T>;
 
 template <Copyable... Ts>
 constexpr int f(Ts...) { return 0; } // #1

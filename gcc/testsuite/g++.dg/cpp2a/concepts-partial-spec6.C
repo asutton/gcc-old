@@ -1,9 +1,8 @@
-// needs port
 // PR c++/67152
-// { dg-options "-std=c++17 -fconcepts" }
+// { dg-options "-std=c++2a" }
 
 template <class T>
-concept bool HasType = requires { typename T::type; };
+concept HasType = requires { typename T::type; };
 
 template<class T>
 struct trait {
@@ -19,7 +18,7 @@ trait<has_type>::type foo() {}
 // constraint so this partial specialization would not have been
 // selected.
 template<class T>
-  requires !HasType<T>
+  requires (!HasType<T>)
 struct trait<T> {
   using type = void;
 };
