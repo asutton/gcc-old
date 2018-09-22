@@ -1,4 +1,4 @@
-// needs fixed; expected identifier on 31 before concept name?
+// needs fixed; expected identifier on 31 before concept name? issue 58
 // { dg-options "-std=c++2a" }
 
 template<typename T>
