@@ -17669,7 +17669,7 @@ cp_parser_maybe_constrained_type_specifier (cp_parser *parser,
         cp_lexer_consume_token (parser->lexer);
       else if (!flag_concepts_ts)
 	warning (0, "using a concept to declare a parameter is only "
-		    "supported with %<-fconcepts%>");
+		    "supported with %<-fconcepts-ts%>");
 
       tree parm = build_constrained_parameter (con, proto, args);
       return synthesize_implicit_template_parm (parser, parm);
@@ -27370,6 +27370,10 @@ cp_parser_template_introduction (cp_parser* parser, bool member_p)
 
   if (!cp_parser_parse_definitely (parser))
     return false;
+
+  if (!flag_concepts_ts)
+    warning(0, "use of template-introductions is supported with "
+    		"%<-fconcepts-ts%>");
 
   push_deferring_access_checks (dk_deferred);
 

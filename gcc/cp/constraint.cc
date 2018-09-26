@@ -300,7 +300,7 @@ build_variable_check (tree id)
 // is the constraint function (not the template), and its PURPOSE is
 // the complete set of arguments substituted into the parameter list.
 static tree
-resolve_constraint_check (tree ovl, tree args)
+resolve_concept_call (tree ovl, tree args)
 {
   int nerrs = 0;
   tree cands = NULL_TREE;
@@ -351,7 +351,7 @@ resolve_constraint_check (tree ovl, tree args)
 // return the concept declaration and arguments being checked. If CALL
 // does not denote a constraint check, return NULL.
 tree
-resolve_constraint_check (tree call)
+resolve_concept_call (tree call)
 {
   gcc_assert (TREE_CODE (call) == CALL_EXPR);
 
@@ -378,7 +378,7 @@ resolve_constraint_check (tree call)
     }
 
   tree args = TREE_OPERAND (target, 1);
-  return resolve_constraint_check (ovl, args);
+  return resolve_concept_call (ovl, args);
 }
 
 /* Returns a pair containing instantiated arguments and the
@@ -405,12 +405,12 @@ resolve_concept_definition_check (tree id)
    and whose TREE_PURPOSE is the prototype parameter.  */
 
 tree
-resolve_variable_concept_check (tree id)
+resolve_concept_check (tree id)
 {
   tree tmpl = TREE_OPERAND (id, 0);
   tree args = TREE_OPERAND (id, 1);
 
-  if (!variable_concept_p (tmpl))
+  if (!concept_definition_p (tmpl))
     return NULL_TREE;
 
   /* Make sure that we have the right parameters before
@@ -420,33 +420,13 @@ resolve_variable_concept_check (tree id)
   ++processing_template_decl;
   tree result = coerce_template_parms (parms, args, tmpl);
   --processing_template_decl;
-  if (result != error_mark_node)
-    {
-      tree decl = DECL_TEMPLATE_RESULT (tmpl);
-      return build_tree_list (result, decl);
-    }
-  else
-    return error_mark_node;
-}
-
-/* Returns a pair containing the checked concept and its associated 
-   prototype parameter. The result is a TREE_LIST whose TREE_VALUE 
-   is the concept (non-template) and whose TREE_PURPOSE contains
-   the converted template arguments, including the deduced prototype
-   parameter (in position 0). */
-
-tree
-resolve_concept_check (tree id)
-{
-  tree tmpl = TREE_OPERAND (id, 0);
-  tree args = TREE_OPERAND (id, 1);
-  tree parms = INNERMOST_TEMPLATE_PARMS (DECL_TEMPLATE_PARMS (tmpl));
-  ++processing_template_decl;
-  tree result = coerce_template_parms (parms, args, tmpl);
-  --processing_template_decl;
   if (result == error_mark_node)
-    return error_mark_node;
-  return build_tree_list (result, DECL_TEMPLATE_RESULT (tmpl));
+    {
+      return error_mark_node;
+    }
+
+  tree decl = DECL_TEMPLATE_RESULT (tmpl);
+  return build_tree_list (result, decl);
 }
 
 /* Given a call expression or template-id expression to
@@ -462,14 +442,9 @@ deduce_constrained_parameter (tree expr, tree& check, tree& proto)
 {
   tree info = NULL_TREE;
   if (TREE_CODE (expr) == TEMPLATE_ID_EXPR)
-    {
-      if (concept_definition_p (TREE_OPERAND (expr, 0)))
-	info = resolve_concept_check (expr);
-      else
-	info = resolve_variable_concept_check (expr);  	
-    }
+    info = resolve_concept_check (expr);  	
   else if (TREE_CODE (expr) == CALL_EXPR)
-    info = resolve_constraint_check (expr);
+    info = resolve_concept_call (expr);
   else
     gcc_unreachable ();
 
@@ -487,17 +462,18 @@ deduce_constrained_parameter (tree expr, tree& check, tree& proto)
   return false;
 }
 
-// Given a call expression or template-id expression to a concept, EXPR,
-// deduce the concept being checked and return the template arguments.
-// Returns NULL_TREE if deduction fails.
+/* Given a call expression or template-id expression to a concept, EXPR,
+   deduce the concept being checked and return the template arguments.
+   Returns NULL_TREE if deduction fails.  */
+
 static tree
 deduce_concept_introduction (tree expr)
 {
   tree info = NULL_TREE;
   if (TREE_CODE (expr) == TEMPLATE_ID_EXPR)
-    info = resolve_variable_concept_check (expr);
+    info = resolve_concept_check (expr);
   else if (TREE_CODE (expr) == CALL_EXPR)
-    info = resolve_constraint_check (expr);
+    info = resolve_concept_call (expr);
   else
     gcc_unreachable ();
 
@@ -660,6 +636,7 @@ get_concept_definition (tree decl)
     return get_variable_initializer (decl);
   if (TREE_CODE (decl) == FUNCTION_DECL)
     return get_returned_expression (decl);
+  
   gcc_unreachable ();
 }
 
@@ -736,12 +713,15 @@ normalize_logical_operation (tree t, tree args, tree_code c, subst_info info)
 tree
 normalize_variable_concept_check (tree t, tree args, subst_info info)
 {
+  /* FIXME: This is never actually called.  */
+  gcc_assert (false);
+  
   tree tmpl = TREE_OPERAND (t, 0);
   tree check;
   if (concept_definition_p (tmpl))
     check = resolve_concept_definition_check (t);
   else if (variable_template_p (tmpl))
-    check = resolve_variable_concept_check (t);
+    check = resolve_concept_check (t);
   else
     {
       /* Check that we didn't refer to a function concept like a variable.  */
@@ -779,7 +759,7 @@ normalize_function_concept_check (tree t, tree args, subst_info info)
 {
   /* Try to resolve this function call as a concept.  If not, then
      it can be returned as a predicate constraint.  */
-  tree check = resolve_constraint_check (t);
+  tree check = resolve_concept_call (t);
   gcc_assert (check);
   if (check == error_mark_node)
     {
@@ -1288,11 +1268,10 @@ process_introduction_parm (tree parameter_list, tree src_parm)
 tree
 finish_template_introduction (tree tmpl_decl, tree intro_list)
 {
-  /* Deduce the concept check.  */
+  /* Build a concept check to deduce the actual parameters.  */
   tree expr = build_concept_check (tmpl_decl, intro_list, tf_warning_or_error);
   if (expr == error_mark_node)
     return NULL_TREE;
-
   tree parms = deduce_concept_introduction (expr);
   if (!parms)
     return NULL_TREE;
@@ -1326,7 +1305,7 @@ finish_template_introduction (tree tmpl_decl, tree intro_list)
   for (; n < TREE_VEC_LENGTH (parms); ++n)
     TREE_VEC_ELT (check_args, n) = TREE_VEC_ELT (parms, n);
 
-  /* Associate the constraint.  */
+  /* Rebuild and associate the constraint.  */
   tree check = build_concept_check (tmpl_decl, 
   				    check_args, 
   				    tf_warning_or_error);
