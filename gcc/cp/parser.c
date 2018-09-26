@@ -13636,7 +13636,7 @@ cp_parser_decl_specifier_seq (cp_parser* parser,
           if (cxx_dialect >= cxx2a)
             {
 	      gcc_rich_location richloc (token->location);
-	      if (warn_concepts_ts)
+	      if (!flag_concepts_ts)
 		warning_at (&richloc, 0, "%<concept%> is deprecated as a "
 					 "declaration specifier in C++20 and "
 					 "later");
@@ -26031,7 +26031,8 @@ cp_parser_requires_clause_opt (cp_parser *parser)
       return NULL_TREE;
     }
   cp_lexer_consume_token (parser->lexer);
-  if (cxx_dialect >= cxx2a)
+
+  if (cxx_dialect >= cxx2a && !flag_concepts_ts)
     return cp_parser_requires_clause_expression (parser);
   else 
     return cp_parser_constraint_expression (parser);
