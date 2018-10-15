@@ -14,8 +14,8 @@ C2{T} void f();
 C2{...Ts} void g(); // { dg-error "cannot be introduced" }
 
 C3{...Ts} struct S2 { };
-
 C3{T, U, V} struct S3 { }; 
+C3{...Ts, U} struct S4 { }; // { dg-error "cannot deduce template parameters" }
 
 template<typename> struct X { };
 
@@ -58,11 +58,15 @@ struct all_same<>
 template<typename... Ts>
 concept AllSame = all_same<Ts...>::value;
 
-AllSame{...Ts} struct S4 { };
+AllSame{...Ts} struct S5 { };
+AllSame{T, U} struct S6 { };
 
 void driver2()
 {
-  S4<int, int> s4a;
-  S4<int, int, int, int> s4b;
-  S4<int, int, int, char> s4c; // { dg-error "template constraint failure" }
+  S5<int, int> s5a;
+  S5<int, int, int, int> s5b;
+  S5<int, int, int, char> s5c; // { dg-error "template constraint failure" }
+  S6<void, void> s6a;
+  S6<void, int> s6c; // { dg-error "template constraint failure" }
+  S6<void, void, void> s6b; // { dg-error "wrong number of template arguments" }
 }

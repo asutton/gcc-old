@@ -1107,17 +1107,7 @@ introduce_template_parameters(tree parms, tree wildcards, int& index)
     {
       tree arg = TREE_VEC_ELT (args, i);
       if (WILDCARD_PACK_P (arg))
-	{
-	  parms = introduce_template_parameter_pack (parms, arg);
-	  if (i != TREE_VEC_LENGTH (args) - 1)
-	    {
-	      tree next = TREE_VEC_ELT (args, i + 1);
-	      location_t loc = DECL_SOURCE_LOCATION (next);
-	      error_at (loc, "template parameters introduced after a "
-			"template parameter pack");
-	      return parms;
-	  }
-	}
+	parms = introduce_template_parameter_pack (parms, arg);
       else
       	parms = introduce_template_parameter (parms, arg);
     }
@@ -1125,8 +1115,9 @@ introduce_template_parameters(tree parms, tree wildcards, int& index)
   return parms;
 }
 
-/* Builds the template parameter list OUT by chaining introduced 
-   parameters from the IN vector.  Here, NUM is the nedex into */
+/* Builds the template parameter list PARMS by chaining introduced 
+   parameters from the WILDCARD vector.  INDEX is the position of
+   the current parameter.  */
 
 static tree
 process_introduction_parms (tree parms, tree wildcards, int& index)
@@ -1152,18 +1143,22 @@ tree
 finish_template_introduction (tree tmpl_decl, tree intro_list)
 {
   /* Build a concept check to deduce the actual parameters.  */
-  tree expr = build_concept_check (tmpl_decl, intro_list, tf_warning_or_error);
+  tree expr = build_concept_check (tmpl_decl, intro_list, tf_none);
   if (expr == error_mark_node)
-    return NULL_TREE;
+    {
+      /* FIXME: The source location is wrong.  */
+      error_at (input_location, "cannot deduce template parameters from "
+				"introduction list");
+      return error_mark_node;
+    }
   tree parms = deduce_concept_introduction (expr);
   if (!parms)
     return NULL_TREE;
-  
+
   /* Build template parameter scope for introduction.  */
   tree parm_list = NULL_TREE;
   begin_template_parm_list ();
   int nargs = MIN (TREE_VEC_LENGTH (parms), TREE_VEC_LENGTH (intro_list));
-  
   for (int n = 0; n < nargs; )
     parm_list = process_introduction_parms (parm_list, parms, n);
   parm_list = end_template_parm_list (parm_list);
