@@ -3846,7 +3846,8 @@ finish_id_expression (tree id_expression,
 
   /* If this refers to a variable concept, then evaluate it in place. 
 
-     FIXME: Why don't we do this with real concepts also? */
+     FIXME: This probably isn't right for non-dependent expressions inside
+     templates. Which means it won't work for constexpr if. */
   if (!processing_template_decl && TREE_CODE (decl) == TEMPLATE_ID_EXPR)
     {
       tree tmpl = TREE_OPERAND (decl, 0);
@@ -3854,6 +3855,9 @@ finish_id_expression (tree id_expression,
       if (variable_concept_p (decl))
 	/* FIXME: If evaluation yields a hard error, diagnose it.  */
 	decl = evaluate_variable_concept(tmpl, args);
+      else if (concept_definition_p (tmpl))
+      	/* FIXME: Diagnose hard errors.  */
+      	decl = evaluate_concept(tmpl, args);
   }
 
   return cp_expr (decl, location);
@@ -8749,6 +8753,7 @@ finish_static_assert (tree condition, tree message, location_t location,
 	}
       else if (condition && condition != error_mark_node)
 	{
+	  debug_tree (condition);
 	  error ("non-constant condition for static assertion");
 	  if (require_rvalue_constant_expression (condition))
 	    cxx_constant_value (condition);
