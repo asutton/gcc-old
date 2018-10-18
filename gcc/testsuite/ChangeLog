@@ -1,3 +1,8 @@
+2018-10-18  Andrew Sutton  <asutton@uakron.edu>
+
+	Add missing test.
+	* g++.dg/cpp2a/concepts3.C: Add access checking tests.
+
 2018-10-18  Paul Thomas  <pault@gcc.gnu.org>
 
 	PR fortran/58618
